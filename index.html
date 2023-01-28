@@ -16,29 +16,29 @@
             parentDiv.appendChild(newDiv);
         }
 
-        function showParameters(){
+        function showParameters() {
 
         }
 
         function init() {
             var selectedPlayer;
             var randomSelection;
-            var solution; 
-            document.getElementById("mySelect").addEventListener("change", function(){
+            var solution;
+            document.getElementById("mySelect").addEventListener("change", function () {
                 selectedPlayer = this.value;
             });
 
-            document.getElementById("start").addEventListener("click", function(){
+            document.getElementById("start").addEventListener("click", function () {
                 if (!selectedPlayer) {
                     document.getElementById("parameters").innerHTML = "Select a player first!";
                     return;
-                } 
+                }
                 randomSelection = selectParameters();
                 var element = document.getElementById("boss");
-                if (element){
+                if (element) {
                     element.parentNode.removeChild(element);
                 }
-                if (randomSelection[0] === "top"){
+                if (randomSelection[0] === "top") {
                     placeDiv("boss", 0, 0, 40, 125, "boss", "😈");
                 } else {
                     placeDiv("boss", 125, 0, 40, 125, "boss", "😈");
@@ -75,7 +75,7 @@
 
             var elements = document.getElementsByClassName("position");
             for (var i = 0; i < elements.length; i++) {
-                elements[i].addEventListener("click", function(e){
+                elements[i].addEventListener("click", function (e) {
                     console.log(e.target.id);
                     if (solution) {
                         console.log(parseInt(e.target.id) == solution[selectedPlayer])
@@ -235,7 +235,7 @@
 
         function selectParameters() {
             let p;
-            if (Math.random() > 0.7){
+            if (Math.random() > 0.7) {
                 p = getTwoUniqueRandomItems(dps);
             } else {
                 p = getTwoUniqueRandomItems(support);
@@ -272,9 +272,9 @@
         <option value="Kurai">Kurai</option>
         <option value="Coco">Coco</option>
         <option value="Eirwyn">Eirwyn</option>
-      </select>
-      <button id="start">Start</button>
-      <span id="parameters"></span>
+    </select>
+    <button id="start">Start</button>
+    <span id="parameters"></span>
     <div id="parentDiv"
         style="position: relative; background-image: url(arena.jpeg); background-size: cover; width: 500px; height: 500px;">
     </div>
