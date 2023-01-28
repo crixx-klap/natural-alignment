@@ -1,0 +1,283 @@
+<html>
+
+<head>
+    <script>
+        function placeDiv(id, top, left, w, h, className, innerHtml) {
+            var parentDiv = document.getElementById("parentDiv");
+            var newDiv = document.createElement("div");
+            newDiv.innerHTML = "" + (innerHtml || "");
+            newDiv.style.top = top + "px";
+            newDiv.style.left = left + "px";
+            newDiv.style.width = w || "30px";
+            newDiv.style.height = h || "30px";
+            newDiv.className = className || "position";
+            newDiv.id = "" + id;
+
+            parentDiv.appendChild(newDiv);
+        }
+
+        function showParameters(){
+
+        }
+
+        function init() {
+            var selectedPlayer;
+            var randomSelection;
+            var solution; 
+            document.getElementById("mySelect").addEventListener("change", function(){
+                selectedPlayer = this.value;
+            });
+
+            document.getElementById("start").addEventListener("click", function(){
+                if (!selectedPlayer) {
+                    document.getElementById("parameters").innerHTML = "Select a player first!";
+                    return;
+                } 
+                randomSelection = selectParameters();
+                var element = document.getElementById("boss");
+                if (element){
+                    element.parentNode.removeChild(element);
+                }
+                if (randomSelection[0] === "top"){
+                    placeDiv("boss", 0, 0, 40, 125, "boss", "😈");
+                } else {
+                    placeDiv("boss", 125, 0, 40, 125, "boss", "😈");
+                }
+
+                element = document.getElementById("parameters");
+                element.innerHTML = "Natural Alignment on " + randomSelection[3] + " and " + randomSelection[2] + " with " + randomSelection[1];
+
+                solution = calculatePositions(randomSelection[0], randomSelection[1], randomSelection[2], randomSelection[3]);
+
+                console.log(selectedPlayer, randomSelection, solution);
+            });
+
+            placeDiv(1, 5, 235);
+            placeDiv(2, 40, 235);
+
+            placeDiv(3, 90, 125);
+            placeDiv(4, 90, 160);
+
+            placeDiv(-3, 130, 125);
+            placeDiv(-4, 130, 160);
+
+            placeDiv(6, 90, 310);
+            placeDiv(7, 90, 345);
+
+            placeDiv(-6, 130, 310);
+            placeDiv(-7, 130, 345);
+
+            placeDiv(-2, 185, 235);
+            placeDiv(-1, 220, 235);
+
+            placeDiv(5, 90, 235);
+            placeDiv(-5, 130, 235);
+
+            var elements = document.getElementsByClassName("position");
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].addEventListener("click", function(e){
+                    console.log(e.target.id);
+                    if (solution) {
+                        console.log(parseInt(e.target.id) == solution[selectedPlayer])
+                        document.getElementById("parameters").innerHTML += parseInt(e.target.id) == solution[selectedPlayer] ? "✅" : "❌";
+                    }
+                });
+            }
+        }
+
+        var clonePosition = ["top", "bottom"];
+        var progressBar = ["fire", "ice"];
+        var Zack = "Zack";
+        var Crixx = "Crixx";
+        var Constance = "Constance";
+        var Elvia = "Elvia";
+        var MonkFF = "MonkFF";
+        var Kurai = "Kurai";
+        var Coco = "Coco";
+        var Eirwyn = "Eirwyn";
+        var dps = [MonkFF, Kurai, Coco, Eirwyn];
+        var support = [Zack, /*Crixx*/, Constance, Elvia];
+        var roles = {};
+        roles[Zack] = "T";
+        roles[Crixx] = "T";
+        roles[Elvia] = "H";
+        roles[Constance] = "H";
+        roles[MonkFF] = "D";
+        roles[Kurai] = "D";
+        roles[Coco] = "D";
+        roles[Eirwyn] = "D";
+
+        function calculatePositions(sClonePosition, sProgressBar, sPlayer1, sPlayer2) {
+            let sNaturalAlignment = roles[sPlayer1] + roles[sPlayer2];
+
+            function isInNaturalAlignment(player) {
+                return sPlayer1 === player || sPlayer2 === player;
+            }
+
+            function findPositionsForFireOnDD(player) {
+                if (isInNaturalAlignment(player)) {
+                    return 5;
+                } else {
+                    let prio = [MonkFF, Kurai, Coco, Eirwyn];
+                    let newPrio = prio.filter(x => x !== sPlayer1 && x !== sPlayer2);
+                    if (player === newPrio[0])
+                        return 7;
+                    else
+                        return 6;
+                }
+            }
+
+            let factor = sClonePosition === "top" ? -1 : 1;
+            let correctPositions = {};
+            if (sNaturalAlignment === "TT" && sProgressBar === "fire") {
+                correctPositions[Zack] = 5 * factor;
+                correctPositions[Crixx] = 5 * factor;
+                correctPositions[Constance] = 3 * factor;
+                correctPositions[Elvia] = 4 * factor;
+                correctPositions[MonkFF] = 1 * factor;
+                correctPositions[Kurai] = 2 * factor;
+                correctPositions[Coco] = 7 * factor;
+                correctPositions[Eirwyn] = 6 * factor;
+            }
+            if (sNaturalAlignment === "TT" && sProgressBar === "ice") {
+                correctPositions[Zack] = 5 * factor;
+                correctPositions[Crixx] = 5 * factor;
+                correctPositions[Constance] = 3 * factor;
+                correctPositions[Elvia] = 3 * factor;
+                correctPositions[MonkFF] = 4 * factor;
+                correctPositions[Kurai] = 6 * factor;
+                correctPositions[Coco] = 7 * factor;
+                correctPositions[Eirwyn] = 7 * factor;
+            }
+
+            if (sNaturalAlignment === "HH" && sProgressBar === "fire") {
+                correctPositions[Zack] = 3 * factor;
+                correctPositions[Crixx] = 4 * factor;
+                correctPositions[Constance] = 5 * factor;
+                correctPositions[Elvia] = 5 * factor;
+                correctPositions[MonkFF] = 1 * factor;
+                correctPositions[Kurai] = 2 * factor;
+                correctPositions[Coco] = 7 * factor;
+                correctPositions[Eirwyn] = 6 * factor;
+            }
+            if (sNaturalAlignment === "HH" && sProgressBar === "ice") {
+                correctPositions[Zack] = 3 * factor;
+                correctPositions[Crixx] = 3 * factor;
+                correctPositions[Constance] = 5 * factor;
+                correctPositions[Elvia] = 5 * factor;
+                correctPositions[MonkFF] = 4 * factor;
+                correctPositions[Kurai] = 6 * factor;
+                correctPositions[Coco] = 7 * factor;
+                correctPositions[Eirwyn] = 7 * factor;
+            }
+
+            if ((sNaturalAlignment === "TH" || sNaturalAlignment === "HT") && sProgressBar === "fire") {
+                correctPositions[Zack] = (isInNaturalAlignment(Zack) ? 5 : 3) * factor;
+                correctPositions[Crixx] = (isInNaturalAlignment(Crixx) ? 5 : 3) * factor;
+                correctPositions[Constance] = (isInNaturalAlignment(Constance) ? 5 : 4) * factor;
+                correctPositions[Elvia] = (isInNaturalAlignment(Zack) ? 5 : 4) * factor;
+                correctPositions[MonkFF] = 1 * factor;
+                correctPositions[Kurai] = 2 * factor;
+                correctPositions[Coco] = 7 * factor;
+                correctPositions[Eirwyn] = 6 * factor;
+            }
+            if ((sNaturalAlignment === "TH" || sNaturalAlignment === "HT") && sProgressBar === "ice") {
+                correctPositions[Zack] = (isInNaturalAlignment(Zack) ? 5 : 3) * factor;
+                correctPositions[Crixx] = (isInNaturalAlignment(Crixx) ? 5 : 3) * factor;
+                correctPositions[Constance] = (isInNaturalAlignment(Constance) ? 5 : 3) * factor;
+                correctPositions[Elvia] = (isInNaturalAlignment(Zack) ? 5 : 3) * factor;
+                correctPositions[MonkFF] = 4 * factor;
+                correctPositions[Kurai] = 6 * factor;
+                correctPositions[Coco] = 7 * factor;
+                correctPositions[Eirwyn] = 7 * factor;
+            }
+
+            if (sNaturalAlignment === "DD" && sProgressBar === "fire") {
+                correctPositions[Zack] = 1 * factor;
+                correctPositions[Crixx] = 2 * factor;
+                correctPositions[Constance] = 3 * factor;
+                correctPositions[Elvia] = 4 * factor;
+                correctPositions[MonkFF] = findPositionsForFireOnDD(MonkFF) * factor;
+                correctPositions[Kurai] = findPositionsForFireOnDD(Kurai) * factor;
+                correctPositions[Coco] = findPositionsForFireOnDD(Coco) * factor;
+                correctPositions[Eirwyn] = findPositionsForFireOnDD(Eirwyn) * factor;
+            }
+            if (sNaturalAlignment === "DD" && sProgressBar === "ice") {
+                correctPositions[Zack] = 4 * factor;
+                correctPositions[Crixx] = 6 * factor;
+                correctPositions[Constance] = 3 * factor;
+                correctPositions[Elvia] = 3 * factor;
+                correctPositions[MonkFF] = (isInNaturalAlignment(MonkFF) ? 5 : 7) * factor;
+                correctPositions[Kurai] = (isInNaturalAlignment(Kurai) ? 5 : 7) * factor;
+                correctPositions[Coco] = (isInNaturalAlignment(Coco) ? 5 : 7) * factor;
+                correctPositions[Eirwyn] = (isInNaturalAlignment(Eirwyn) ? 5 : 7) * factor;
+            }
+
+            return correctPositions;
+        }
+
+
+        function getRandomItem(arr) {
+            var randomIndex = Math.floor(Math.random() * arr.length);
+            return arr[randomIndex];
+        }
+
+        function getTwoUniqueRandomItems(arr) {
+            var copy = arr.slice();
+            var randomItems = [];
+            for (var i = 0; i < 2; i++) {
+                var randomIndex = Math.floor(Math.random() * copy.length);
+                randomItems.push(copy[randomIndex]);
+                copy.splice(randomIndex, 1);
+            }
+            return randomItems;
+        }
+
+        function selectParameters() {
+            let p;
+            if (Math.random() > 0.7){
+                p = getTwoUniqueRandomItems(dps);
+            } else {
+                p = getTwoUniqueRandomItems(support);
+            }
+
+            return [getRandomItem(clonePosition), getRandomItem(progressBar), p[0], p[1]];
+        }
+    </script>
+    <style>
+        .position {
+            background-color: lightcyan;
+            position: absolute;
+        }
+
+        .boss {
+            background-color: lightcoral;
+            position: absolute;
+        }
+
+        .position:hover {
+            background-color: aqua;
+        }
+    </style>
+</head>
+
+<body onload="init()">
+    <select id="mySelect">
+        <option value="" disabled selected>Select player</option>
+        <option value="Zack">Zack</option>
+        <option value="Crixx">Crixx</option>
+        <option value="Constance">Constance</option>
+        <option value="Elvia">Elvia</option>
+        <option value="MonkFF">MonkFF</option>
+        <option value="Kurai">Kurai</option>
+        <option value="Coco">Coco</option>
+        <option value="Eirwyn">Eirwyn</option>
+      </select>
+      <button id="start">Start</button>
+      <span id="parameters"></span>
+    <div id="parentDiv"
+        style="position: relative; background-image: url(arena.jpeg); background-size: cover; width: 500px; height: 500px;">
+    </div>
+</body>
+
+</html>
